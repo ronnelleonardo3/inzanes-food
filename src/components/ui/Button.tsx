@@ -1,11 +1,17 @@
-type ButtonProps = {
-    children: React.ReactNode;
-  };
-  
-  export default function Button({ children }: ButtonProps) {
-    return (
-      <button
-        className="
+import { ButtonHTMLAttributes, ReactNode } from "react";
+
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  children: ReactNode;
+};
+
+export default function Button({
+  children,
+  className = "",
+  ...props
+}: ButtonProps) {
+  return (
+    <button
+      className={`
         rounded-xl
         bg-[#1F3B2E]
         px-8
@@ -17,9 +23,11 @@ type ButtonProps = {
         duration-300
         hover:bg-[#C68B2C]
         hover:scale-105
-        "
-      >
-        {children}
-      </button>
-    );
-  }
+        ${className}
+      `}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
