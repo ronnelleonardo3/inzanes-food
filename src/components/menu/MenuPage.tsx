@@ -5,7 +5,12 @@ import MenuCard from "@/components/menu/MenuCard";
 import { menuItems } from "@/data/menu";
 
 const categories = ["All", "Meals", "Snacks", "Drinks"] as const;
-const sortOptions = ["Featured", "Price: Low to High", "Price: High to Low", "Name: A-Z"] as const;
+const sortOptions = [
+  "Featured",
+  "Price: Low to High",
+  "Price: High to Low",
+  "Name: A-Z",
+] as const;
 
 export default function MenuPage() {
   const [selectedCategory, setSelectedCategory] =
@@ -56,17 +61,16 @@ export default function MenuPage() {
     return items;
   }, [selectedCategory, search, sortBy]);
 
+  // DEBUG
+  console.log("Filtered Items:", filteredItems);
+
   return (
     <main className="bg-[#F2E8D8] min-h-screen">
-
       {/* Hero */}
-
       <section className="py-24">
-
         <div className="mx-auto max-w-7xl px-6 text-center">
-
           <span className="inline-flex rounded-full border border-[#C68B2C] px-5 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-[#1F3B2E]">
-            OUR MENU
+          OUR MENU
           </span>
 
           <h1 className="mt-6 text-5xl font-black text-[#1F3B2E] lg:text-7xl">
@@ -77,20 +81,16 @@ export default function MenuPage() {
           </h1>
 
           <p className="mx-auto mt-8 max-w-3xl text-lg leading-9 text-gray-600">
-            Browse our handcrafted meals, delicious snacks, and refreshing drinks.
-            Every item is prepared with quality ingredients and served with passion.
+            Browse our handcrafted meals, delicious snacks, and refreshing
+            drinks. Every item is prepared with quality ingredients and served
+            with passion.
           </p>
-
         </div>
-
       </section>
 
       {/* Search + Sort */}
-
       <section className="pb-10">
-
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 lg:flex-row lg:items-center lg:justify-between">
-
           <input
             type="text"
             placeholder="Search menu..."
@@ -107,24 +107,16 @@ export default function MenuPage() {
             className="rounded-xl border border-[#E7D6B3] bg-white px-5 py-4 outline-none focus:border-[#C68B2C]"
           >
             {sortOptions.map((option) => (
-              <option key={option}>
-                {option}
-              </option>
+              <option key={option}>{option}</option>
             ))}
           </select>
-
         </div>
-
       </section>
 
       {/* Category Filter */}
-
       <section className="pb-12">
-
         <div className="mx-auto flex max-w-7xl flex-wrap justify-center gap-4 px-6">
-
           {categories.map((category) => (
-
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
@@ -136,29 +128,19 @@ export default function MenuPage() {
             >
               {category}
             </button>
-
           ))}
-
         </div>
-
       </section>
 
       {/* Menu Grid */}
-
       <section className="pb-28">
-
         <div className="mx-auto grid max-w-7xl gap-10 px-6 md:grid-cols-2 lg:grid-cols-3">
-
           {filteredItems.length > 0 ? (
             filteredItems.map((item) => (
-              <MenuCard
-                key={item.id}
-                item={item}
-              />
+              <MenuCard key={item.id} item={item} />
             ))
           ) : (
             <div className="col-span-full rounded-3xl bg-white p-16 text-center shadow-sm">
-
               <h3 className="text-3xl font-bold text-[#1F3B2E]">
                 No menu items found
               </h3>
@@ -166,14 +148,10 @@ export default function MenuPage() {
               <p className="mt-4 text-gray-600">
                 Try changing your search or selecting another category.
               </p>
-
             </div>
           )}
-
         </div>
-
       </section>
-
     </main>
   );
 }
