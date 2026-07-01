@@ -1,9 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Button from "@/components/ui/Button";
 import { X, Plus, Minus, Trash2 } from "lucide-react";
+
 import { useCart } from "@/hooks/useCart";
+import { useCheckout } from "@/hooks/useCheckout";
+
+import CustomerDetailsModal, {
+  CustomerDetails,
+} from "./CustomerDetailsModal";
+import ConfirmationModal from "./ConfirmationModal";
+import PaymentModal, {
+  PaymentMethod,
+} from "./PaymentModal";
+import SuccessModal from "./SuccessModal";
 
 interface CartDrawerProps {
   open: boolean;
@@ -20,8 +32,33 @@ export default function CartDrawer({
     increaseQuantity,
     decreaseQuantity,
     removeFromCart,
+    setCustomerDetails,
+    customerDetails,
+    clearCart,
   } = useCart();
 
+  const checkout = useCheckout();
+  const [selectedMethod, setSelectedMethod] =
+  useState<PaymentMethod>("cash");
+
+  const handleContinue = (details: CustomerDetails) => {
+    setCustomerDetails(details);
+    checkout.goToConfirmation();
+  };
+
+  const handleConfirmOrder = () => {
+    checkout.goToPayment();
+  };
+  
+  const handlePlaceOrder = () => {
+    checkout.goToSuccess();
+  };
+  
+  const handleDone = () => {
+    clearCart();
+    checkout.resetCheckout();
+    onClose();
+  };
   return (
     <>
       {/* Overlay */}
@@ -97,7 +134,7 @@ export default function CartDrawer({
                       {item.name}
                     </h3>
 
-                    <p className="mt-1 text-[#C68B2C] font-semibold">
+                    <p className="mt-1 font-semibold text-[#C68B2C]">
                       ₱{item.price}
                     </p>
 
@@ -106,7 +143,9 @@ export default function CartDrawer({
                       <div className="flex items-center gap-2">
 
                         <button
-                          onClick={() => decreaseQuantity(item.id)}
+                          onClick={() =>
+                            decreaseQuantity(item.id)
+                          }
                           className="rounded-full border p-1"
                         >
                           <Minus size={16} />
@@ -115,7 +154,9 @@ export default function CartDrawer({
                         <span>{item.quantity}</span>
 
                         <button
-                          onClick={() => increaseQuantity(item.id)}
+                          onClick={() =>
+                            increaseQuantity(item.id)
+                          }
                           className="rounded-full border p-1"
                         >
                           <Plus size={16} />
@@ -124,7 +165,9 @@ export default function CartDrawer({
                       </div>
 
                       <button
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() =>
+                          removeFromCart(item.id)
+                        }
                         className="text-red-500"
                       >
                         <Trash2 size={18} />
@@ -143,7 +186,6 @@ export default function CartDrawer({
           )}
 
         </div>
-
         {/* Footer */}
 
         <div className="absolute bottom-0 left-0 right-0 border-t border-[#E7D6B3] bg-white p-6">
@@ -160,13 +202,49 @@ export default function CartDrawer({
 
           </div>
 
-          <Button>
+          <Button
+            onClick={checkout.openCustomerModal}
+            disabled={cart.length === 0}
+          >
             Checkout
           </Button>
 
         </div>
 
       </aside>
+
+      {/* Customer Details Modal */}
+
+      <CustomerDetailsModal
+        open={checkout.customerModalOpen}
+        onClose={checkout.closeCustomerModal}
+        onContinue={handleContinue}
+      />
+
+      {/* Confirmation Modal */}
+
+      <ConfirmationModal
+        open={checkout.confirmationModalOpen}
+        customer={customerDetails}
+        cart={cart}
+        totalPrice={totalPrice}
+        onBack={checkout.goToCustomer}
+        onConfirm={handleConfirmOrder}
+        onClose={checkout.resetCheckout}
+      />
+    <PaymentModal
+  open={checkout.paymentModalOpen}
+  totalPrice={totalPrice}
+  selectedMethod={selectedMethod}
+  onSelectMethod={setSelectedMethod}
+  onBack={checkout.goToConfirmation}
+  onPlaceOrder={handlePlaceOrder}
+  onClose={checkout.resetCheckout}
+/>
+<SuccessModal
+  open={checkout.successModalOpen}
+  onDone={handleDone}
+/>
     </>
   );
 }

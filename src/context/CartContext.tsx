@@ -8,6 +8,7 @@ import {
   ReactNode,
 } from "react";
 import { MenuItem } from "@/types/menu";
+import { CustomerDetails } from "@/components/menu/CustomerDetailsModal";
 
 export interface CartItem extends MenuItem {
   quantity: number;
@@ -15,11 +16,17 @@ export interface CartItem extends MenuItem {
 
 interface CartContextType {
   cart: CartItem[];
+
+  customerDetails: CustomerDetails | null;
+
   addToCart: (item: MenuItem, quantity?: number) => void;
   removeFromCart: (id: number) => void;
   increaseQuantity: (id: number) => void;
   decreaseQuantity: (id: number) => void;
   clearCart: () => void;
+
+  setCustomerDetails: (details: CustomerDetails) => void;
+  clearCustomerDetails: () => void;
 
   totalItems: number;
   totalPrice: number;
@@ -33,6 +40,9 @@ export function CartProvider({
   children: ReactNode;
 }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+
+  const [customerDetails, setCustomerDetailsState] =
+    useState<CustomerDetails | null>(null);
 
   const addToCart = (item: MenuItem, quantity = 1) => {
     setCart((prev) => {
@@ -85,8 +95,17 @@ export function CartProvider({
     );
   };
 
+  const setCustomerDetails = (details: CustomerDetails) => {
+    setCustomerDetailsState(details);
+  };
+
+  const clearCustomerDetails = () => {
+    setCustomerDetailsState(null);
+  };
+
   const clearCart = () => {
     setCart([]);
+    clearCustomerDetails();
   };
 
   const totalItems = useMemo(
@@ -108,11 +127,14 @@ export function CartProvider({
     <CartContext.Provider
       value={{
         cart,
+        customerDetails,
         addToCart,
         removeFromCart,
         increaseQuantity,
         decreaseQuantity,
         clearCart,
+        setCustomerDetails,
+        clearCustomerDetails,
         totalItems,
         totalPrice,
       }}
