@@ -15,7 +15,7 @@ export default function Footer() {
 
           <div>
 
-            <Logo />
+          <Logo variant="footer" />
 
             <p className="mt-6 leading-8 text-gray-300">
               Bringing Crazy Good Food to Every Table.

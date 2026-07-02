@@ -66,6 +66,11 @@ export default function CustomerDetailsModal({
     }));
   };
 
+  const handlePhoneChange = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 10);
+    updateField("phoneNumber", digits);
+  };
+
   const validate = () => {
     const newErrors = {
       fullName: "",
@@ -82,6 +87,10 @@ export default function CustomerDetailsModal({
 
     if (!form.phoneNumber.trim()) {
       newErrors.phoneNumber = "Phone number is required.";
+      valid = false;
+    } else if (!/^\d{10}$/.test(form.phoneNumber)) {
+      newErrors.phoneNumber =
+        "Enter a valid 10-digit mobile number.";
       valid = false;
     }
 
@@ -102,7 +111,10 @@ export default function CustomerDetailsModal({
   const handleContinue = () => {
     if (!validate()) return;
 
-    onContinue(form);
+    onContinue({
+      ...form,
+      phoneNumber: `+63${form.phoneNumber}`,
+    });
   };
 
   return (
@@ -147,13 +159,25 @@ export default function CustomerDetailsModal({
               Phone Number *
             </label>
 
-            <input
-              value={form.phoneNumber}
-              onChange={(e) =>
-                updateField("phoneNumber", e.target.value)
-              }
-              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none focus:border-[#C68B2C]"
-            />
+            <div className="flex overflow-hidden rounded-xl border border-gray-300 bg-white focus-within:border-[#C68B2C]">
+              <div className="flex items-center border-r border-gray-300 bg-gray-100 px-4 font-medium text-[#1F3B2E]">
+                +63
+              </div>
+
+              <input
+                value={form.phoneNumber}
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                inputMode="numeric"
+                autoComplete="tel"
+                maxLength={10}
+                placeholder="9123456789"
+                className="w-full px-4 py-3 outline-none"
+              />
+            </div>
+
+            <p className="mt-1 text-xs text-gray-500">
+              Enter your 10-digit mobile number.
+            </p>
 
             {errors.phoneNumber && (
               <p className="mt-1 text-sm text-red-500">

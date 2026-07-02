@@ -55,11 +55,11 @@ export default function Navbar() {
 
         {/* Right Side */}
         <div className="flex items-center gap-4">
-
-          <Button>
-            Order Now
-          </Button>
-
+          <Link href="/menu">
+            <Button>
+              Order Now
+            </Button>
+          </Link>
         </div>
 
       </div>
