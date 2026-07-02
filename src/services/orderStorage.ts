@@ -1,4 +1,4 @@
-import { Order } from "@/types/order";
+import { Order, OrderStatus } from "@/types/order";
 import { generateOrderId } from "@/utils/orderId";
 
 const STORAGE_KEY = "inzanes-food-orders";
@@ -48,6 +48,30 @@ export function createOrder(
   saveStoredOrders(orders);
 
   return newOrder;
+}
+
+export function updateOrderStatus(
+  orderId: string,
+  status: OrderStatus
+): Order | null {
+  const orders = getStoredOrders();
+
+  const orderIndex = orders.findIndex(
+    (order) => order.id === orderId
+  );
+
+  if (orderIndex === -1) {
+    return null;
+  }
+
+  orders[orderIndex] = {
+    ...orders[orderIndex],
+    status,
+  };
+
+  saveStoredOrders(orders);
+
+  return orders[orderIndex];
 }
 
 export function clearOrders() {
