@@ -16,6 +16,7 @@ import PaymentModal, {
   PaymentMethod,
 } from "./PaymentModal";
 import SuccessModal from "./SuccessModal";
+import { createOrder } from "@/services/orderStorage";
 
 interface CartDrawerProps {
   open: boolean;
@@ -51,11 +52,25 @@ export default function CartDrawer({
   };
   
   const handlePlaceOrder = () => {
+    if (!customerDetails || cart.length === 0) {
+      return;
+    }
+  
+    createOrder({
+      customer: customerDetails,
+      items: cart,
+      total: totalPrice,
+      paymentMethod: selectedMethod,
+      createdAt: new Date().toISOString(),
+      status: "pending",
+    });
+  
+    clearCart();
+  
     checkout.goToSuccess();
   };
   
   const handleDone = () => {
-    clearCart();
     checkout.resetCheckout();
     onClose();
   };
