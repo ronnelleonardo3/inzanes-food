@@ -156,4 +156,4 @@ export const menuItems: MenuItem[] = [
     featured: true,
     available: true,
   },
-];console.log("TOTAL MENU ITEMS:", menuItems.length);
+];

@@ -61,9 +61,7 @@ export default function MenuPage() {
     return items;
   }, [selectedCategory, search, sortBy]);
 
-  // DEBUG
-  console.log("Filtered Items:", filteredItems);
-
+  
   return (
     <main className="bg-[#F2E8D8] min-h-screen">
       {/* Hero */}
