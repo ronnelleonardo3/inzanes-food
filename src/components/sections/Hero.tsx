@@ -2,18 +2,26 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 
 export default function Hero() {
+  const router = useRouter();
+
+  const goToMenu = () => {
+    router.push("/menu");
+  };
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="bg-[#F2E8D8] min-h-[calc(100vh-90px)] flex items-center overflow-hidden"
+      className="min-h-[calc(100vh-90px)] overflow-hidden bg-[#F2E8D8] flex items-center"
     >
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-16 px-6 py-16 lg:grid-cols-2">
         {/* LEFT CONTENT */}
+
         <div>
           <span className="inline-flex rounded-xl border border-[#C68B2C] px-5 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-[#1F3B2E]">
             GOOD FOOD
@@ -45,32 +53,53 @@ export default function Hero() {
           </p>
 
           <div className="mt-10 flex flex-wrap gap-5">
-            <Button>ORDER NOW</Button>
+            <Button onClick={goToMenu}>
+              ORDER NOW
+            </Button>
 
-            <button className="rounded-xl border-2 border-[#1F3B2E] px-8 py-4 font-semibold text-[#1F3B2E] transition hover:bg-[#1F3B2E] hover:text-white">
+            <button
+              onClick={goToMenu}
+              className="rounded-xl border-2 border-[#1F3B2E] px-8 py-4 font-semibold text-[#1F3B2E] transition hover:bg-[#1F3B2E] hover:text-white"
+            >
               VIEW MENU
             </button>
           </div>
 
           <div className="mt-14 flex flex-wrap gap-16">
             <div>
-              <h3 className="text-4xl font-bold text-[#1F3B2E]">100%</h3>
-              <p className="text-gray-600">Fresh Ingredients</p>
+              <h3 className="text-4xl font-bold text-[#1F3B2E]">
+                100%
+              </h3>
+
+              <p className="text-gray-600">
+                Fresh Ingredients
+              </p>
             </div>
 
             <div>
-              <h3 className="text-4xl font-bold text-[#1F3B2E]">50+</h3>
-              <p className="text-gray-600">Menu Items</p>
+              <h3 className="text-4xl font-bold text-[#1F3B2E]">
+                50+
+              </h3>
+
+              <p className="text-gray-600">
+                Menu Items
+              </p>
             </div>
 
             <div>
-              <h3 className="text-4xl font-bold text-[#1F3B2E]">4.9★</h3>
-              <p className="text-gray-600">Customer Rating</p>
+              <h3 className="text-4xl font-bold text-[#1F3B2E]">
+                4.9★
+              </h3>
+
+              <p className="text-gray-600">
+                Customer Rating
+              </p>
             </div>
           </div>
         </div>
 
         {/* RIGHT IMAGE */}
+
         <div className="relative">
           <Image
             src="/images/hero/hero.png"
