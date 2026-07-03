@@ -23,5 +23,12 @@
 		// Enable image optimization
 		// see https://opennext.js.org/cloudflare/howtos/image
 		"binding": "IMAGES"
-	}
+	},
+	"d1_databases": [
+		{
+			"binding": "y",
+			"database_name": "inzanes-food-db",
+			"database_id": "75070737-8447-4896-8c82-5585d4a89aa6"
+		}
+	]
 }
