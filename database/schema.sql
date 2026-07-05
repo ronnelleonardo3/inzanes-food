@@ -4,6 +4,11 @@ CREATE TABLE IF NOT EXISTS orders (
     phone TEXT NOT NULL,
     table_number TEXT,
     order_type TEXT NOT NULL,
+
+    delivery_address TEXT,
+    landmark TEXT,
+    special_instructions TEXT,
+
     payment_method TEXT NOT NULL,
     status TEXT NOT NULL,
     total REAL NOT NULL,

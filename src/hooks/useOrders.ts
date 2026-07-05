@@ -2,29 +2,37 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import {
-  getOrders,
-  updateOrderStatus,
-} from "@/services/orderStorage";
-
-import {
-  Order,
-  OrderStatus,
-} from "@/types/order";
+import { DashboardOrder } from "@/types/dashboardOrder";
+import { OrderStatus } from "@/types/order";
 
 import {
   canTransition,
-  isFinalStatus,
   getAvailableStatuses,
+  isFinalStatus,
 } from "@/utils/orderStatus";
 
 export function useOrders() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<DashboardOrder[]>([]);
 
-  const loadOrders = useCallback(() => {
-    const data = getOrders();
+  const loadOrders = useCallback(async () => {
+    try {
+      const response = await fetch("/api/orders", {
+        cache: "no-store",
+      });
 
-    setOrders(data);
+      if (!response.ok) {
+        throw new Error("Failed to load orders.");
+      }
+
+      const data = (await response.json()) as {
+        success: boolean;
+        orders: DashboardOrder[];
+      };
+
+      setOrders(data.orders);
+    } catch (error) {
+      console.error("Failed to load orders:", error);
+    }
   }, []);
 
   useEffect(() => {
@@ -32,7 +40,7 @@ export function useOrders() {
 
     const interval = window.setInterval(() => {
       loadOrders();
-    }, 1000);
+    }, 3000);
 
     return () => {
       window.clearInterval(interval);
@@ -43,9 +51,7 @@ export function useOrders() {
     orderId: string,
     nextStatus: OrderStatus
   ): boolean => {
-    const order = orders.find(
-      (item) => item.id === orderId
-    );
+    const order = orders.find((item) => item.id === orderId);
 
     if (!order) {
       return false;
@@ -59,16 +65,8 @@ export function useOrders() {
       return false;
     }
 
-    const updatedOrder = updateOrderStatus(
-      orderId,
-      nextStatus
-    );
-
-    if (!updatedOrder) {
-      return false;
-    }
-
-    loadOrders();
+    // Status update endpoint will be implemented next.
+    console.log("Update order", orderId, nextStatus);
 
     return true;
   };

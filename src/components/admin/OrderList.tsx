@@ -3,7 +3,9 @@
 import { ClipboardList } from "lucide-react";
 
 import OrderCard from "./OrderCard";
+
 import { useOrders } from "@/hooks/useOrders";
+import { getAvailableStatuses } from "@/utils/orderStatus";
 
 export default function OrdersList() {
   const { orders, changeStatus } = useOrders();
@@ -35,6 +37,7 @@ export default function OrdersList() {
         <OrderCard
           key={order.id}
           order={order}
+          availableStatuses={getAvailableStatuses(order.status)}
           onChangeStatus={changeStatus}
         />
       ))}

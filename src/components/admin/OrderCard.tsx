@@ -1,17 +1,62 @@
-import { Order, OrderStatus } from "@/types/order";
+import { DashboardOrder } from "@/types/dashboardOrder";
+import { OrderStatus } from "@/types/order";
 
 interface OrderCardProps {
-  order: Order;
+  order: DashboardOrder;
+  availableStatuses: readonly OrderStatus[];
   onChangeStatus: (
     orderId: string,
     status: OrderStatus
-  ) => void;
+  ) => boolean;
 }
+
+const STATUS_CONFIG: Record<
+  OrderStatus,
+  {
+    label: string;
+    activeClass: string;
+    inactiveClass: string;
+  }
+> = {
+  pending: {
+    label: "Pending",
+    activeClass: "bg-yellow-500 text-white",
+    inactiveClass:
+      "border border-yellow-500 text-yellow-600 hover:bg-yellow-50",
+  },
+  preparing: {
+    label: "Preparing",
+    activeClass: "bg-blue-600 text-white",
+    inactiveClass:
+      "border border-blue-600 text-blue-600 hover:bg-blue-50",
+  },
+  ready: {
+    label: "Ready",
+    activeClass: "bg-green-600 text-white",
+    inactiveClass:
+      "border border-green-600 text-green-600 hover:bg-green-50",
+  },
+  completed: {
+    label: "Completed",
+    activeClass: "bg-gray-800 text-white",
+    inactiveClass:
+      "border border-gray-700 text-gray-700 hover:bg-gray-100",
+  },
+  cancelled: {
+    label: "Cancelled",
+    activeClass: "bg-red-600 text-white",
+    inactiveClass:
+      "border border-red-600 text-red-600 hover:bg-red-50",
+  },
+};
 
 export default function OrderCard({
   order,
+  availableStatuses,
   onChangeStatus,
 }: OrderCardProps) {
+  const currentStatus = STATUS_CONFIG[order.status];
+
   return (
     <div className="rounded-3xl border border-[#E7D6B3] bg-white p-6 shadow-sm">
       <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
@@ -93,82 +138,50 @@ export default function OrderCard({
             {order.paymentMethod.toUpperCase()}
           </p>
 
-          <div className="mt-4">
+          <div className="mt-5">
 
             <p className="mb-2 font-semibold text-[#1F3B2E]">
-              Order Status
+              Current Status
             </p>
 
-            <div className="flex flex-wrap gap-2">
-
-              <button
-                onClick={() =>
-                  onChangeStatus(order.id, "pending")
-                }
-                className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                  order.status === "pending"
-                    ? "bg-yellow-500 text-white"
-                    : "border border-yellow-500 text-yellow-600 hover:bg-yellow-50"
-                }`}
-              >
-                Pending
-              </button>
-
-              <button
-                onClick={() =>
-                  onChangeStatus(order.id, "preparing")
-                }
-                className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                  order.status === "preparing"
-                    ? "bg-blue-600 text-white"
-                    : "border border-blue-600 text-blue-600 hover:bg-blue-50"
-                }`}
-              >
-                Preparing
-              </button>
-
-              <button
-                onClick={() =>
-                  onChangeStatus(order.id, "ready")
-                }
-                className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                  order.status === "ready"
-                    ? "bg-green-600 text-white"
-                    : "border border-green-600 text-green-600 hover:bg-green-50"
-                }`}
-              >
-                Ready
-              </button>
-
-              <button
-                onClick={() =>
-                  onChangeStatus(order.id, "completed")
-                }
-                className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                  order.status === "completed"
-                    ? "bg-gray-800 text-white"
-                    : "border border-gray-700 text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                Completed
-              </button>
-
-              <button
-                onClick={() =>
-                  onChangeStatus(order.id, "cancelled")
-                }
-                className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                  order.status === "cancelled"
-                    ? "bg-red-600 text-white"
-                    : "border border-red-600 text-red-600 hover:bg-red-50"
-                }`}
-              >
-                Cancel
-              </button>
-
-            </div>
+            <span
+              className={`inline-flex rounded-xl px-4 py-2 text-sm font-semibold ${currentStatus.activeClass}`}
+            >
+              {currentStatus.label}
+            </span>
 
           </div>
+
+          {availableStatuses.length > 0 && (
+            <div className="mt-5">
+
+              <p className="mb-2 font-semibold text-[#1F3B2E]">
+                Available Actions
+              </p>
+
+              <div className="flex flex-wrap gap-2">
+
+                {availableStatuses.map((status) => {
+                  const config = STATUS_CONFIG[status];
+
+                  return (
+                    <button
+                      key={status}
+                      type="button"
+                      onClick={() =>
+                        onChangeStatus(order.id, status)
+                      }
+                      className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${config.inactiveClass}`}
+                    >
+                      {config.label}
+                    </button>
+                  );
+                })}
+
+              </div>
+
+            </div>
+          )}
 
         </div>
 
@@ -210,7 +223,6 @@ export default function OrderCard({
               <span>
                 ₱{item.price * item.quantity}
               </span>
-
             </div>
           ))}
 

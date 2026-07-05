@@ -1,10 +1,10 @@
 "use client";
 
-import { Order } from "@/types/order";
+import { DashboardOrder } from "@/types/dashboardOrder";
 import { useKitchenActions } from "@/hooks/useKitchenActions";
 
 interface KitchenTicketProps {
-  order: Order;
+  order: DashboardOrder;
 }
 
 export default function KitchenTicket({

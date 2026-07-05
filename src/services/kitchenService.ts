@@ -1,24 +1,25 @@
-import {
-  getOrders,
-  getOrderById,
-  updateOrderStatus,
-} from "@/services/orderStorage";
-import { Order, OrderStatus } from "@/types/order";
+import { DashboardOrder } from "@/types/dashboardOrder";
+import { OrderStatus } from "@/types/order";
 
-export function getKitchenOrders(): Order[] {
-  const orders = getOrders();
+export async function getKitchenOrders(): Promise<DashboardOrder[]> {
+  const response = await fetch("/api/orders", {
+    cache: "no-store",
+  });
 
-  return orders
-    .filter(
-      (order) =>
-        order.status !== "completed" &&
-        order.status !== "cancelled"
-    )
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() -
-        new Date(a.createdAt).getTime()
-    );
+  if (!response.ok) {
+    throw new Error("Failed to load kitchen orders.");
+  }
+
+  const data = (await response.json()) as {
+    success: boolean;
+    orders: DashboardOrder[];
+  };
+
+  return data.orders.filter(
+    (order) =>
+      order.status !== "completed" &&
+      order.status !== "cancelled"
+  );
 }
 
 function getNextStatus(
@@ -34,27 +35,17 @@ function getNextStatus(
     case "ready":
       return "completed";
 
-    case "completed":
-    case "cancelled":
     default:
       return null;
   }
 }
 
-export function advanceKitchenOrder(
+export async function advanceKitchenOrder(
   orderId: string
-): Order | null {
-  const order = getOrderById(orderId);
+) {
+  // We'll connect this to D1 in the next step.
+  // For now we only want Kitchen to READ from D1.
+  console.log("Advance order:", orderId);
 
-  if (!order) {
-    return null;
-  }
-
-  const nextStatus = getNextStatus(order.status);
-
-  if (!nextStatus) {
-    return null;
-  }
-
-  return updateOrderStatus(orderId, nextStatus);
+  return getNextStatus;
 }

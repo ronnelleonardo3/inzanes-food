@@ -1,15 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Order } from "@/types/order";
+import { DashboardOrder } from "@/types/dashboardOrder";
 import { getKitchenOrders } from "@/services/kitchenService";
 
 export function useKitchenOrders() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<DashboardOrder[]>([]);
 
-  const loadOrders = () => {
-    const data = getKitchenOrders();
-    setOrders(data);
+  const loadOrders = async () => {
+    try {
+      const data = await getKitchenOrders();
+      setOrders(data);
+    } catch (error) {
+      console.error("Failed to load kitchen orders:", error);
+    }
   };
 
   useEffect(() => {
@@ -17,7 +21,7 @@ export function useKitchenOrders() {
 
     const interval = window.setInterval(() => {
       loadOrders();
-    }, 1000);
+    }, 3000);
 
     return () => {
       window.clearInterval(interval);
