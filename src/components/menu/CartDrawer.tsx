@@ -11,12 +11,14 @@ import { useCheckout } from "@/hooks/useCheckout";
 import CustomerDetailsModal, {
   CustomerDetails,
 } from "./CustomerDetailsModal";
+
 import ConfirmationModal from "./ConfirmationModal";
+
 import PaymentModal, {
   PaymentMethod,
 } from "./PaymentModal";
+
 import SuccessModal from "./SuccessModal";
-import { createOrder } from "@/services/orderStorage";
 
 interface CartDrawerProps {
   open: boolean;
@@ -39,8 +41,9 @@ export default function CartDrawer({
   } = useCart();
 
   const checkout = useCheckout();
+
   const [selectedMethod, setSelectedMethod] =
-  useState<PaymentMethod>("cash");
+    useState<PaymentMethod>("cash");
 
   const handleContinue = (details: CustomerDetails) => {
     setCustomerDetails(details);
@@ -50,33 +53,53 @@ export default function CartDrawer({
   const handleConfirmOrder = () => {
     checkout.goToPayment();
   };
-  
-  const handlePlaceOrder = () => {
+
+  const handlePlaceOrder = async () => {
     if (!customerDetails || cart.length === 0) {
       return;
     }
-  
-    createOrder({
-      customer: customerDetails,
-      items: cart,
-      total: totalPrice,
-      paymentMethod: selectedMethod,
-      createdAt: new Date().toISOString(),
-      status: "pending",
-    });
-  
-    clearCart();
-  
-    checkout.goToSuccess();
+
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          customer: customerDetails,
+          items: cart,
+          total: totalPrice,
+          paymentMethod: selectedMethod,
+          createdAt: new Date().toISOString(),
+          status: "pending",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save order.");
+      }
+
+      clearCart();
+
+      checkout.goToSuccess();
+    } catch (error) {
+      console.error("Checkout failed:", error);
+
+      alert(
+        "Unable to place your order. Please try again."
+      );
+    }
   };
-  
+
   const handleDone = () => {
     checkout.resetCheckout();
     onClose();
   };
+
   return (
-    <>
-      {/* Overlay */}
+    <>      {/* Overlay */}
 
       {open && (
         <div
@@ -201,6 +224,7 @@ export default function CartDrawer({
           )}
 
         </div>
+
         {/* Footer */}
 
         <div className="absolute bottom-0 left-0 right-0 border-t border-[#E7D6B3] bg-white p-6">
@@ -226,9 +250,7 @@ export default function CartDrawer({
 
         </div>
 
-      </aside>
-
-      {/* Customer Details Modal */}
+      </aside>      {/* Customer Details Modal */}
 
       <CustomerDetailsModal
         open={checkout.customerModalOpen}
@@ -247,19 +269,24 @@ export default function CartDrawer({
         onConfirm={handleConfirmOrder}
         onClose={checkout.resetCheckout}
       />
-    <PaymentModal
-  open={checkout.paymentModalOpen}
-  totalPrice={totalPrice}
-  selectedMethod={selectedMethod}
-  onSelectMethod={setSelectedMethod}
-  onBack={checkout.goToConfirmation}
-  onPlaceOrder={handlePlaceOrder}
-  onClose={checkout.resetCheckout}
-/>
-<SuccessModal
-  open={checkout.successModalOpen}
-  onDone={handleDone}
-/>
-    </>
+
+      {/* Payment Modal */}
+
+      <PaymentModal
+        open={checkout.paymentModalOpen}
+        totalPrice={totalPrice}
+        selectedMethod={selectedMethod}
+        onSelectMethod={setSelectedMethod}
+        onBack={checkout.goToConfirmation}
+        onPlaceOrder={handlePlaceOrder}
+        onClose={checkout.resetCheckout}
+      />
+
+      {/* Success Modal */}
+
+      <SuccessModal
+        open={checkout.successModalOpen}
+        onDone={handleDone}
+      />    </>
   );
 }
