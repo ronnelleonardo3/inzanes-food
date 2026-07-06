@@ -17,6 +17,7 @@ interface CreateOrderInput {
   createdAt: string;
   status: Order["status"];
 }
+
 interface OrderRow {
   id: string;
   customer_name: string;
@@ -77,7 +78,6 @@ export async function getAllOrders(): Promise<DashboardOrder[]> {
 
     return {
       id: order.id,
-
       customer: {
         fullName: order.customer_name,
         phoneNumber: order.phone,
@@ -87,9 +87,7 @@ export async function getAllOrders(): Promise<DashboardOrder[]> {
         landmark: order.landmark ?? "",
         specialInstructions: order.special_instructions ?? "",
       },
-
       items,
-
       paymentMethod: order.payment_method,
       status: order.status,
       total: order.total,
@@ -109,20 +107,20 @@ export async function createOrder(
     .prepare(
       `
       INSERT INTO orders (
-    id,
-    customer_name,
-    phone,
-    table_number,
-    order_type,
-    delivery_address,
-    landmark,
-    special_instructions,
-    payment_method,
-    status,
-    total,
-    created_at
-)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        id,
+        customer_name,
+        phone,
+        table_number,
+        order_type,
+        delivery_address,
+        landmark,
+        special_instructions,
+        payment_method,
+        status,
+        total,
+        created_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `
     )
     .bind(
@@ -164,6 +162,26 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       )
       .run();
   }
-  
+
   return orderId;
+}
+
+export async function updateStatus(
+  orderId: string,
+  status: Order["status"]
+): Promise<boolean> {
+  const db = getDB();
+
+  const result = await db
+    .prepare(
+      `
+      UPDATE orders
+      SET status = ?
+      WHERE id = ?
+      `
+    )
+    .bind(status, orderId)
+    .run();
+
+  return (result.meta?.changes ?? 0) > 0;
 }

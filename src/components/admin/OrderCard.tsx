@@ -7,7 +7,7 @@ interface OrderCardProps {
   onChangeStatus: (
     orderId: string,
     status: OrderStatus
-  ) => boolean;
+  ) => Promise<boolean>;
 }
 
 const STATUS_CONFIG: Record<

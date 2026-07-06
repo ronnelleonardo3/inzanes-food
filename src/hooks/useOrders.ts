@@ -47,10 +47,10 @@ export function useOrders() {
     };
   }, [loadOrders]);
 
-  const changeStatus = (
+  const changeStatus = async (
     orderId: string,
     nextStatus: OrderStatus
-  ): boolean => {
+  ): Promise<boolean> => {
     const order = orders.find((item) => item.id === orderId);
 
     if (!order) {
@@ -65,10 +65,31 @@ export function useOrders() {
       return false;
     }
 
-    // Status update endpoint will be implemented next.
-    console.log("Update order", orderId, nextStatus);
+    try {
+      const response = await fetch(
+        `/api/orders/${orderId}/status`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status: nextStatus,
+          }),
+        }
+      );
 
-    return true;
+      if (!response.ok) {
+        throw new Error("Failed to update order status.");
+      }
+
+      await loadOrders();
+
+      return true;
+    } catch (error) {
+      console.error("Failed to update order:", error);
+      return false;
+    }
   };
 
   return {

@@ -42,10 +42,49 @@ function getNextStatus(
 
 export async function advanceKitchenOrder(
   orderId: string
-) {
-  // We'll connect this to D1 in the next step.
-  // For now we only want Kitchen to READ from D1.
-  console.log("Advance order:", orderId);
+): Promise<void> {
+  const ordersResponse = await fetch("/api/orders", {
+    cache: "no-store",
+  });
 
-  return getNextStatus;
+  if (!ordersResponse.ok) {
+    throw new Error("Failed to load orders.");
+  }
+
+  const ordersData = (await ordersResponse.json()) as {
+    success: boolean;
+    orders: DashboardOrder[];
+  };
+
+  const order = ordersData.orders.find((o) => o.id === orderId);
+
+  if (!order) {
+    throw new Error("Order not found.");
+  }
+
+  const nextStatus = getNextStatus(order.status);
+
+  if (!nextStatus) {
+    return;
+  }
+
+  const response = await fetch(
+    `/api/orders/${orderId}/status`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        status: nextStatus,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to update order status.");
+  }
+
+  // Refresh the Kitchen board.
+  window.location.reload();
 }
